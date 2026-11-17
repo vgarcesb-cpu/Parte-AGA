@@ -1,4 +1,4 @@
-const CACHE_NAME = 'parte-aga-v3';
+const CACHE_NAME = 'parte-aga-v5';
 const ASSETS = [
   './',
   './index.html',

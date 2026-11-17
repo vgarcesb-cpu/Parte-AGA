@@ -652,7 +652,7 @@
       sections: [
         {
           id: 'instalaciones',
-          title: 'PARTE INSTALACIONES',
+          title: 'PARTE DE FUERZA INSTALACIONES',
           members: [
             { id: '1', name: 'SOF V. Garcés', status: 'BAEB - C/A', condition: 'presente' },
             { id: '2', name: 'SG1 F. Zúñiga', status: 'BAEB - C/A', condition: 'presente' },
@@ -668,18 +668,18 @@
           id: 'btt',
           title: 'PARTE DE FUERZA BTT',
           members: [
-            { id: '9', name: 'SOF Torres', status: 'BAEB', condition: 'presente' },
-            { id: '10', name: 'CB1° Castro', status: 'BAEB', condition: 'presente' }
+            { id: '9', name: 'SOF J. Torres', status: 'BAEB', condition: 'presente' },
+            { id: '10', name: 'CB1° A. Castro', status: 'BAEB', condition: 'presente' }
           ]
         },
         {
           id: 'alimentacion',
-          title: 'PARTE ALIMENTACIÓN',
+          title: 'PARTE DE FUERZA ALIMENTACIÓN',
           members: [
-            { id: '11', name: 'SOF Aguilar', status: 'FLA', condition: 'ausente' },
+            { id: '11', name: 'SOF J. Aguilar', status: 'FLA', condition: 'ausente' },
             { id: '12', name: 'CB1 N. Lazcano', status: 'AGA', condition: 'presente' },
             { id: '13', name: 'CB1 S. Maturana', status: 'AGA', condition: 'presente' },
-            { id: '14', name: 'CBO Gallardo', status: 'AGA', condition: 'presente' },
+            { id: '14', name: 'CBO M. Gallardo', status: 'AGA', condition: 'presente' },
             { id: '15', name: 'PAC J. Pérez', status: 'AGA', condition: 'presente' },
             { id: '16', name: 'PAC L. Castro', status: 'AGA', condition: 'presente' },
             { id: '17', name: 'PAC F. Acevedo', status: 'FLA (16/11 - 27/11)', condition: 'ausente' },
@@ -705,6 +705,11 @@
       { label: 'DEVOLUCIÓN', cond: 'ausente' }
     ];
 
+    const TITLE_MIGRATIONS = {
+      'instalaciones': 'PARTE DE FUERZA INSTALACIONES',
+      'alimentacion': 'PARTE DE FUERZA ALIMENTACIÓN'
+    };
+
     let appData = loadData();
     let customPresets = loadCustomPresets();
     let isEditing = false;
@@ -714,7 +719,17 @@
     function loadData() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.sections)) {
+            parsed.sections.forEach(sec => {
+              if (TITLE_MIGRATIONS[sec.id]) {
+                sec.title = TITLE_MIGRATIONS[sec.id];
+              }
+            });
+          }
+          return parsed;
+        }
       } catch (e) {}
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
