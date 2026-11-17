@@ -644,8 +644,8 @@
   <canvas id="exportCanvas" style="display:none;"></canvas>
 
   <script>
-    const STORAGE_KEY = 'parte_diario_aga_pwa_v2';
-    const CUSTOM_PRESETS_KEY = 'parte_diario_aga_presets_v2';
+    const STORAGE_KEY = 'parte_diario_aga_pwa_v3';
+    const CUSTOM_PRESETS_KEY = 'parte_diario_aga_presets_v3';
 
     const DEFAULT_DATA = {
       date: '18/11/2026',
@@ -1004,22 +1004,22 @@
     function buildWhatsAppText() {
       const s = getSummary();
       const dateStr = document.getElementById('reportDate').value.trim() || appData.date;
+      const nl = String.fromCharCode(10);
       let lines = [];
-      lines.push(`*PARTE DIARIO — AGA*`);
-      lines.push(`📅 *Fecha:* ${dateStr}`);
-      lines.push(`📊 *Resumen:* Fuerza: ${s.fuerza} | Presentes: ${s.presentes} | C/A: ${s.ca} | S/A: ${s.sa} | Ausentes: ${s.ausentes}`);
+      lines.push('*PARTE DIARIO — AGA*');
+      lines.push('📅 *Fecha:* ' + dateStr);
+      lines.push('📊 *Resumen:* Fuerza: ' + s.fuerza + ' | Presentes: ' + s.presentes + ' | C/A: ' + s.ca + ' | S/A: ' + s.sa + ' | Ausentes: ' + s.ausentes);
       lines.push('');
 
       appData.sections.forEach(sec => {
-        lines.push(`*${sec.title}*`);
+        lines.push('*' + sec.title + '*');
         sec.members.forEach(m => {
-          lines.push(`• ${m.name}: *${m.status}*`);
+          lines.push('• ' + m.name + ': *' + m.status + '*');
         });
         lines.push('');
       });
 
-      return lines.join('
-').trim();
+      return lines.join(nl).trim();
     }
 
     async function copyText() {
@@ -1065,7 +1065,7 @@
       ctx.fillStyle = '#f59e0b';
       ctx.font = 'bold 26px sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(`📅 ${dateStr}`, W - 44, 74);
+      ctx.fillText('📅 ' + dateStr, W - 44, 74);
       ctx.textAlign = 'left';
 
       const boxes = [
@@ -1146,7 +1146,7 @@
       try {
         const res = await fetch(lastDataUrl);
         const blob = await res.blob();
-        const file = new File([blob], `Parte_AGA_${appData.date.replace(/\//g, '-')}.png`, { type: 'image/png' });
+        const file = new File([blob], 'Parte_AGA_' + appData.date.replace(/\//g, '-') + '.png', { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
@@ -1159,7 +1159,7 @@
 
       const a = document.createElement('a');
       a.href = lastDataUrl;
-      a.download = `Parte_AGA_${appData.date.replace(/\//g, '-')}.png`;
+      a.download = 'Parte_AGA_' + appData.date.replace(/\//g, '-') + '.png';
       a.click();
     }
 
