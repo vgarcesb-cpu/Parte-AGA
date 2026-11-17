@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b1120" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Control de Parte Diario — AGA</title>
+  <link rel="manifest" href="./manifest.json" />
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #131c31;
+      --card-hover: #192540;
+      --border: #243252;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #f59e0b;
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 105px;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .title-group h1 {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      margin-top: 3px;
+    }
+
+    .status-pill.saved {
+      background: rgba(16, 185, 129, 0.15);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pill.editing {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .date-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .date-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 7px;
+    }
+
+    .date-box input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      width: 84px;
+      text-align: center;
+      outline: none;
+    }
+
+    .quick-dates {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-qdate {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-qdate:active {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .stat-lbl {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .c-fuerza { color: #38bdf8; }
+    .c-pres { color: var(--green); }
+    .c-ca { color: var(--accent); }
+    .c-sa { color: var(--purple); }
+    .c-aus { color: var(--red); }
+
+    .container {
+      padding: 12px 14px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: 18px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .btn-add-mini {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .person-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .person-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .person-card:active {
+      background: var(--card-hover);
+    }
+
+    .person-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.presente { background: var(--green); box-shadow: 0 0 6px rgba(16, 185, 129, 0.5); }
+    .dot.ausente { background: var(--red); box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+
+    .person-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      text-align: right;
+    }
+
+    .status-badge.ausente {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+    }
+
+    .status-badge.presente {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 10px 14px 14px;
+      z-index: 30;
+    }
+
+    .bar-inner {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .btn-save-full {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      background: #10b981;
+      color: #052e16;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    }
+
+    .action-row-saved {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+    }
+
+    .btn-main {
+      padding: 12px 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .btn-img {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .btn-txt {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+    }
+
+    .btn-edit-mode {
+      background: rgba(59, 130, 246, 0.16);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      padding: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: #131c31;
+      border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      width: 100%;
+      max-width: 600px;
+      padding: 18px 16px 26px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .btn-close {
+      background: #1e293b;
+      border: none;
+      color: #94a3b8;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .cond-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .cond-btn {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .cond-btn.active-pres {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--green);
+      color: #6ee7b7;
+    }
+
+    .cond-btn.active-aus {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--red);
+      color: #fca5a5;
+    }
+
+    .section-lbl-mini {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .chip-wrap {
+      display: inline-flex;
+      align-items: center;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .chip-wrap.custom {
+      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.12);
+    }
+
+    .chip-btn {
+      background: transparent;
+      border: none;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip-del {
+      background: rgba(239, 68, 68, 0.2);
+      border: none;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fca5a5;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .input-field {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 11px 14px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-apply {
+      flex: 1;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      padding: 11px;
+      border-radius: 9px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .preview-box {
+      text-align: center;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .preview-hint {
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: #052e16;
+      padding: 9px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 800;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast" class="toast"></div>
+
+  <header>
+    <div class="header-top">
+      <div class="title-group">
+        <h1>PARTE DIARIO — AGA</h1>
+        <span id="statusPill" class="status-pill saved">✅ Parte Guardado</span>
+      </div>
+      <div class="date-controls">
+        <div class="date-box">
+          <span>📅</span>
+          <input type="text" id="reportDate" value="18/11/2026" oninput="enterEditMode()" />
+        </div>
+        <div class="quick-dates">
+          <button type="button" class="btn-qdate" onclick="setQuickDate(0)">Hoy</button>
+          <button type="button" class="btn-qdate" onclick="setQuickDate(1)">Mañana</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val c-fuerza" id="stFuerza">20</div>
+        <div class="stat-lbl">Fuerza</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val c-pres" id="stPres">0</div>
+        <div class="stat-lbl">Pres.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val c-ca" id="stCA">0</div>
+        <div class="stat-lbl">C/A</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val c-sa" id="stSA">0</div>
+        <div class="stat-lbl">S/A</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val c-aus" id="stAus">0</div>
+        <div class="stat-lbl">Aus.</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="sectionsContainer"></main>
+
+  <div class="bottom-bar">
+    <div class="bar-inner" id="bottomBarContent"></div>
+  </div>
+
+  <div id="editModal" class="modal-backdrop" onclick="closeModalOnBg(event, 'editModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 id="modalTitle">Editar Integrante</h3>
+        <button class="btn-close" onclick="closeModal('editModal')">✕</button>
+      </div>
+
+      <input type="text" id="editName" class="input-field" placeholder="Grado y Nombre" />
+
+      <div class="cond-toggle">
+        <button type="button" id="btnCondPres" class="cond-btn" onclick="setCondition('presente')">✅ Presente</button>
+        <button type="button" id="btnCondAus" class="cond-btn" onclick="setCondition('ausente')">❌ Ausente</button>
+      </div>
+
+      <div class="section-lbl-mini">Toque Rápido</div>
+      <div class="chips-grid" id="quickChips"></div>
+
+      <div class="section-lbl-mini">Estado / Detalle</div>
+      <input type="text" id="editStatus" class="input-field" placeholder="Escribe un estado (se guardará en Toque Rápido)" />
+
+      <div class="modal-actions">
+        <button type="button" id="btnDeletePerson" class="btn-del" onclick="deletePerson()">Eliminar</button>
+        <button type="button" class="btn-apply" onclick="applyEdit()">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="imgModal" class="modal-backdrop" onclick="closeModalOnBg(event, 'imgModal')">
+    <div class="modal-sheet preview-box">
+      <div class="modal-header">
+        <h3>Reporte Gráfico Listo</h3>
+        <button class="btn-close" onclick="closeModal('imgModal')">✕</button>
+      </div>
+      <p class="preview-hint">Mantén presionada la imagen para Copiar o Compartir en WhatsApp/Signal</p>
+      <img id="generatedImg" alt="Parte Diario AGA" />
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button class="btn-main btn-img" onclick="shareOrDownloadImage()">📤 Enviar / Bajar PNG</button>
+        <button class="btn-main btn-txt" onclick="closeModal('imgModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="exportCanvas" style="display:none;"></canvas>
+
+  <script>
+    const STORAGE_KEY = 'parte_diario_aga_pwa_v2';
+    const CUSTOM_PRESETS_KEY = 'parte_diario_aga_presets_v2';
+
+    const DEFAULT_DATA = {
+      date: '18/11/2026',
+      sections: [
+        {
+          id: 'instalaciones',
+          title: 'PARTE INSTALACIONES',
+          members: [
+            { id: '1', name: 'SOF V. Garcés', status: 'BAEB - C/A', condition: 'presente' },
+            { id: '2', name: 'SG1 F. Zúñiga', status: 'BAEB - C/A', condition: 'presente' },
+            { id: '3', name: 'CBO L. Regla', status: 'LM / 03 DIC', condition: 'ausente' },
+            { id: '4', name: 'PAC E. Pérez', status: 'BAEB - S/A', condition: 'presente' },
+            { id: '5', name: 'PAC J. Castillo', status: 'BAEB - S/A', condition: 'presente' },
+            { id: '6', name: 'PAC M. Chávez', status: 'HOSP. - S/A', condition: 'presente' },
+            { id: '7', name: 'PAC O. Sánchez', status: 'BAEB - C/A', condition: 'presente' },
+            { id: '8', name: 'PAC A. Adonis', status: 'BAEB - C/A', condition: 'presente' }
+          ]
+        },
+        {
+          id: 'btt',
+          title: 'PARTE DE FUERZA BTT',
+          members: [
+            { id: '9', name: 'SOF Torres', status: 'BAEB', condition: 'presente' },
+            { id: '10', name: 'CB1° Castro', status: 'BAEB', condition: 'presente' }
+          ]
+        },
+        {
+          id: 'alimentacion',
+          title: 'PARTE ALIMENTACIÓN',
+          members: [
+            { id: '11', name: 'SOF Aguilar', status: 'FLA', condition: 'ausente' },
+            { id: '12', name: 'CB1 N. Lazcano', status: 'AGA', condition: 'presente' },
+            { id: '13', name: 'CB1 S. Maturana', status: 'AGA', condition: 'presente' },
+            { id: '14', name: 'CBO Gallardo', status: 'AGA', condition: 'presente' },
+            { id: '15', name: 'PAC J. Pérez', status: 'AGA', condition: 'presente' },
+            { id: '16', name: 'PAC L. Castro', status: 'AGA', condition: 'presente' },
+            { id: '17', name: 'PAC F. Acevedo', status: 'FLA (16/11 - 27/11)', condition: 'ausente' },
+            { id: '18', name: 'PAC E. Pizarro', status: 'AGA', condition: 'presente' },
+            { id: '19', name: 'PAC I. Núñez', status: 'AGA', condition: 'presente' },
+            { id: '20', name: 'PAC A. Pérez', status: 'AGA', condition: 'presente' }
+          ]
+        }
+      ]
+    };
+
+    const BASE_PRESETS = [
+      { label: 'AGA - C/A', cond: 'presente' },
+      { label: 'AGA - S/A', cond: 'presente' },
+      { label: 'BAEB - C/A', cond: 'presente' },
+      { label: 'BAEB - S/A', cond: 'presente' },
+      { label: 'AGA', cond: 'presente' },
+      { label: 'BAEB', cond: 'presente' },
+      { label: 'COM FIDAE', cond: 'presente' },
+      { label: 'FLA', cond: 'ausente' },
+      { label: 'S/G', cond: 'ausente' },
+      { label: 'LM / ', cond: 'ausente' },
+      { label: 'DEVOLUCIÓN', cond: 'ausente' }
+    ];
+
+    let appData = loadData();
+    let customPresets = loadCustomPresets();
+    let isEditing = false;
+    let editingCtx = { sectionId: null, memberId: null, isNew: false, condition: 'presente' };
+    let lastDataUrl = '';
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+
+    function loadCustomPresets() {
+      try {
+        const saved = localStorage.getItem(CUSTOM_PRESETS_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return [];
+    }
+
+    function saveCustomPresets() {
+      try {
+        localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(customPresets));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => { t.style.display = 'none'; }, 2300);
+    }
+
+    function formatDateObj(d) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function setQuickDate(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const formatted = formatDateObj(d);
+      document.getElementById('reportDate').value = formatted;
+      appData.date = formatted;
+      enterEditMode();
+    }
+
+    function enterEditMode() {
+      isEditing = true;
+      appData.date = document.getElementById('reportDate').value.trim() || appData.date;
+      updateBottomBar();
+    }
+
+    function saveParte() {
+      appData.date = document.getElementById('reportDate').value.trim() || appData.date;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {}
+      isEditing = false;
+      updateBottomBar();
+      showToast('✅ Cambios guardados en el Parte');
+    }
+
+    function updateBottomBar() {
+      const bar = document.getElementById('bottomBarContent');
+      const pill = document.getElementById('statusPill');
+
+      if (isEditing) {
+        pill.className = 'status-pill editing';
+        pill.textContent = '✏️ Editando (Sin guardar)';
+        bar.innerHTML = `
+          <button class="btn-save-full" onclick="saveParte()">
+            💾 Guardar Cambios en el Parte
+          </button>
+        `;
+      } else {
+        pill.className = 'status-pill saved';
+        pill.textContent = '✅ Parte Guardado';
+        bar.innerHTML = `
+          <div class="action-row-saved">
+            <button class="btn-main btn-img" onclick="openImagePreview()">
+              🖼️ Ver / Enviar Imagen
+            </button>
+            <button class="btn-main btn-txt" onclick="copyText()">
+              📋 Copiar Texto
+            </button>
+            <button class="btn-main btn-edit-mode" onclick="enterEditMode()" title="Editar Parte">
+              ✏️ Editar
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function getSummary() {
+      let fuerza = 0, presentes = 0, ca = 0, sa = 0, ausentes = 0;
+      appData.sections.forEach(sec => {
+        sec.members.forEach(m => {
+          fuerza++;
+          const st = (m.status || '').toUpperCase();
+          if (st.includes('C/A')) ca++;
+          if (st.includes('S/A')) sa++;
+          if (m.condition === 'ausente') ausentes++;
+          else presentes++;
+        });
+      });
+      return { fuerza, presentes, ca, sa, ausentes };
+    }
+
+    function updateStats() {
+      const s = getSummary();
+      document.getElementById('stFuerza').textContent = s.fuerza;
+      document.getElementById('stPres').textContent = s.presentes;
+      document.getElementById('stCA').textContent = s.ca;
+      document.getElementById('stSA').textContent = s.sa;
+      document.getElementById('stAus').textContent = s.ausentes;
+    }
+
+    function render() {
+      document.getElementById('reportDate').value = appData.date;
+      const container = document.getElementById('sectionsContainer');
+      container.innerHTML = '';
+
+      appData.sections.forEach(sec => {
+        const secEl = document.createElement('section');
+        secEl.className = 'section';
+
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.innerHTML = `
+          <span class="section-title">${sec.title} (${sec.members.length})</span>
+          <button class="btn-add-mini" onclick="openAddMember('${sec.id}')">+ Agregar</button>
+        `;
+        secEl.appendChild(header);
+
+        const list = document.createElement('div');
+        list.className = 'person-list';
+
+        sec.members.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'person-card';
+          card.onclick = () => openEditMember(sec.id, m.id);
+          card.innerHTML = `
+            <div class="person-info">
+              <span class="dot ${m.condition}"></span>
+              <span class="person-name">${m.name}</span>
+            </div>
+            <span class="status-badge ${m.condition}">${m.status}</span>
+          `;
+          list.appendChild(card);
+        });
+
+        secEl.appendChild(list);
+        container.appendChild(secEl);
+      });
+
+      updateStats();
+      updateBottomBar();
+    }
+
+    function renderChips() {
+      const box = document.getElementById('quickChips');
+      box.innerHTML = '';
+
+      BASE_PRESETS.forEach(p => {
+        const wrap = document.createElement('div');
+        wrap.className = 'chip-wrap';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip-btn';
+        btn.textContent = p.label;
+        btn.onclick = () => {
+          document.getElementById('editStatus').value = p.label;
+          setCondition(p.cond);
+        };
+        wrap.appendChild(btn);
+        box.appendChild(wrap);
+      });
+
+      customPresets.forEach((p, idx) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'chip-wrap custom';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip-btn';
+        btn.textContent = p.label;
+        btn.onclick = () => {
+          document.getElementById('editStatus').value = p.label;
+          setCondition(p.cond);
+        };
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'chip-del';
+        del.textContent = '×';
+        del.onclick = (e) => {
+          e.stopPropagation();
+          customPresets.splice(idx, 1);
+          saveCustomPresets();
+          renderChips();
+        };
+
+        wrap.appendChild(btn);
+        wrap.appendChild(del);
+        box.appendChild(wrap);
+      });
+    }
+
+    function setCondition(cond) {
+      editingCtx.condition = cond;
+      document.getElementById('btnCondPres').className = 'cond-btn' + (cond === 'presente' ? ' active-pres' : '');
+      document.getElementById('btnCondAus').className = 'cond-btn' + (cond === 'ausente' ? ' active-aus' : '');
+    }
+
+    function openEditMember(sectionId, memberId) {
+      const sec = appData.sections.find(s => s.id === sectionId);
+      const member = sec.members.find(m => m.id === memberId);
+      editingCtx = { sectionId, memberId, isNew: false, condition: member.condition };
+
+      document.getElementById('modalTitle').textContent = 'Editar Integrante';
+      document.getElementById('editName').value = member.name;
+      document.getElementById('editStatus').value = member.status;
+      document.getElementById('btnDeletePerson').style.display = 'block';
+      setCondition(member.condition);
+      renderChips();
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openAddMember(sectionId) {
+      editingCtx = { sectionId, memberId: null, isNew: true, condition: 'presente' };
+      document.getElementById('modalTitle').textContent = 'Agregar Integrante';
+      document.getElementById('editName').value = '';
+      document.getElementById('editStatus').value = 'AGA';
+      document.getElementById('btnDeletePerson').style.display = 'none';
+      setCondition('presente');
+      renderChips();
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function applyEdit() {
+      const name = document.getElementById('editName').value.trim();
+      const status = document.getElementById('editStatus').value.trim() || 'AGA';
+      if (!name) return;
+
+      const norm = status.toUpperCase();
+      const existsInBase = BASE_PRESETS.some(p => p.label.trim().toUpperCase() === norm);
+      const existsInCustom = customPresets.some(p => p.label.trim().toUpperCase() === norm);
+      if (!existsInBase && !existsInCustom) {
+        customPresets.push({ label: status, cond: editingCtx.condition });
+        saveCustomPresets();
+      }
+
+      const sec = appData.sections.find(s => s.id === editingCtx.sectionId);
+      if (editingCtx.isNew) {
+        sec.members.push({
+          id: Date.now().toString(),
+          name,
+          status,
+          condition: editingCtx.condition
+        });
+      } else {
+        const m = sec.members.find(x => x.id === editingCtx.memberId);
+        if (m) {
+          m.name = name;
+          m.status = status;
+          m.condition = editingCtx.condition;
+        }
+      }
+
+      closeModal('editModal');
+      isEditing = true;
+      render();
+    }
+
+    function deletePerson() {
+      const sec = appData.sections.find(s => s.id === editingCtx.sectionId);
+      sec.members = sec.members.filter(m => m.id !== editingCtx.memberId);
+      closeModal('editModal');
+      isEditing = true;
+      render();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function closeModalOnBg(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    function buildWhatsAppText() {
+      const s = getSummary();
+      const dateStr = document.getElementById('reportDate').value.trim() || appData.date;
+      let lines = [];
+      lines.push(`*PARTE DIARIO — AGA*`);
+      lines.push(`📅 *Fecha:* ${dateStr}`);
+      lines.push(`📊 *Resumen:* Fuerza: ${s.fuerza} | Presentes: ${s.presentes} | C/A: ${s.ca} | S/A: ${s.sa} | Ausentes: ${s.ausentes}`);
+      lines.push('');
+
+      appData.sections.forEach(sec => {
+        lines.push(`*${sec.title}*`);
+        sec.members.forEach(m => {
+          lines.push(`• ${m.name}: *${m.status}*`);
+        });
+        lines.push('');
+      });
+
+      return lines.join('
+').trim();
+    }
+
+    async function copyText() {
+      const text = buildWhatsAppText();
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('📋 Texto copiado para WhatsApp');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('📋 Texto copiado');
+      }
+    }
+
+    function openImagePreview() {
+      const canvas = document.getElementById('exportCanvas');
+      const ctx = canvas.getContext('2d');
+      const s = getSummary();
+      const dateStr = document.getElementById('reportDate').value.trim() || appData.date;
+
+      const W = 900;
+      let totalRows = 0;
+      appData.sections.forEach(sec => { totalRows += 1 + sec.members.length; });
+      const H = 310 + totalRows * 52 + appData.sections.length * 24;
+
+      canvas.width = W;
+      canvas.height = H;
+
+      ctx.fillStyle = '#0b1120';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(0, 0, W, 12);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 38px sans-serif';
+      ctx.fillText('PARTE DIARIO — AGA', 44, 76);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`📅 ${dateStr}`, W - 44, 74);
+      ctx.textAlign = 'left';
+
+      const boxes = [
+        { label: 'FUERZA', val: s.fuerza, color: '#38bdf8' },
+        { label: 'PRESENTES', val: s.presentes, color: '#10b981' },
+        { label: 'C/A', val: s.ca, color: '#f59e0b' },
+        { label: 'S/A', val: s.sa, color: '#a78bfa' },
+        { label: 'AUSENTES', val: s.ausentes, color: '#ef4444' }
+      ];
+
+      const gap = 14;
+      const boxW = (W - 88 - gap * 4) / 5;
+      boxes.forEach((b, i) => {
+        const bx = 44 + i * (boxW + gap);
+        const by = 110;
+        ctx.fillStyle = '#131c31';
+        ctx.beginPath();
+        ctx.roundRect(bx, by, boxW, 96, 12);
+        ctx.fill();
+        ctx.strokeStyle = '#243252';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = b.color;
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(b.val), bx + boxW / 2, by + 50);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 15px sans-serif';
+        ctx.fillText(b.label, bx + boxW / 2, by + 78);
+      });
+      ctx.textAlign = 'left';
+
+      let y = 248;
+      appData.sections.forEach(sec => {
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillText(sec.title, 44, y);
+        y += 14;
+
+        ctx.strokeStyle = '#243252';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(44, y);
+        ctx.lineTo(W - 44, y);
+        ctx.stroke();
+        y += 36;
+
+        sec.members.forEach(m => {
+          ctx.fillStyle = m.condition === 'ausente' ? '#ef4444' : '#10b981';
+          ctx.beginPath();
+          ctx.arc(56, y - 8, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#f1f5f9';
+          ctx.font = '600 24px sans-serif';
+          ctx.fillText(m.name, 78, y);
+
+          ctx.fillStyle = m.condition === 'ausente' ? '#fca5a5' : '#6ee7b7';
+          ctx.font = 'bold 23px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(m.status, W - 44, y);
+          ctx.textAlign = 'left';
+
+          y += 48;
+        });
+
+        y += 20;
+      });
+
+      lastDataUrl = canvas.toDataURL('image/png');
+      document.getElementById('generatedImg').src = lastDataUrl;
+      document.getElementById('imgModal').classList.add('open');
+    }
+
+    async function shareOrDownloadImage() {
+      try {
+        const res = await fetch(lastDataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `Parte_AGA_${appData.date.replace(/\//g, '-')}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Parte Diario AGA'
+          });
+          return;
+        }
+      } catch (e) {}
+
+      const a = document.createElement('a');
+      a.href = lastDataUrl;
+      a.download = `Parte_AGA_${appData.date.replace(/\//g, '-')}.png`;
+      a.click();
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>

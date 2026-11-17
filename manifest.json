@@ -1,0 +1,19 @@
+{
+  "name": "Control de Parte Diario — AGA",
+  "short_name": "Parte AGA",
+  "description": "Control de asistencia, fuerza y generación de reporte para WhatsApp/Signal.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230b1120'/%3E%3Crect x='36' y='36' width='440' height='440' rx='84' fill='none' stroke='%23f59e0b' stroke-width='20'/%3E%3Ctext x='256' y='295' font-family='system-ui,sans-serif' font-weight='900' font-size='155' fill='%23ffffff' text-anchor='middle'%3EAGA%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
